@@ -1,7 +1,8 @@
 #lang racket/base
 (require (for-syntax racket/base)
          racket/match
-         racket/promise)
+         racket/promise
+         racket/struct)
 
 ;; ----------------------------------------
 ;; Lazy structs
@@ -114,3 +115,16 @@
                               (set-box! (visited) (make-weak-hasheq))
                               (set! v (f x)))
                             v))])))))]))
+
+;; ----------------------------------------
+;; Curried, printable equality predicate
+
+(provide is?)
+
+;; is? : Any -> Any -> Boolean
+;; (define ((is? x) y) (equal? x y))
+(struct is? (v)
+  #:property prop:custom-write
+  (make-constructor-style-printer (lambda (s) 'is?) (lambda (s) (list (is?-v s))))
+  #:property prop:procedure
+  (lambda (self x) (equal? (is?-v self) x)))
