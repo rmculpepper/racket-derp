@@ -4,9 +4,7 @@
   ; Herp Core implements the minimal core 
   ; of a context-free language recognizer.
   
-  (require "memoization.rkt")
-  (require "fixed-points.rkt")
-  (require "lazy-structs.rkt")
+  (require "util.rkt")
 
   (provide (all-defined-out))
   

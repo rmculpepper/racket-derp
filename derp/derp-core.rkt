@@ -1,9 +1,7 @@
 (module derp-core
   racket
   
-  (require "memoization.rkt")
-  (require "fixed-points.rkt")
-  (require "lazy-structs.rkt")
+  (require "util.rkt")
 
   (provide (all-defined-out))
   

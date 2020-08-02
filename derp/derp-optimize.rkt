@@ -4,8 +4,7 @@
   (provide (all-defined-out))
   
   (require (except-in "derp-core.rkt" ∅? ε?))
-  (require "memoization.rkt")
-  (require "fixed-points.rkt")
+  (require "util.rkt")
   
   (define/fix (ε? L)
     #:bottom #t
