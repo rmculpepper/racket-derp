@@ -11,9 +11,10 @@
 (define-syntax (define-lazy-struct stx)
   (syntax-case stx ()
     [(_ name {field ...})
-     (with-syntax ([$name (datum->syntax #'name (gensym (syntax->datum #'name)))])
+     (with-syntax ([($name) (generate-temporaries #'(name))])
        #'(begin
-           (define-struct $name {field ...})
+           (define-struct $name {field ...}
+             #:transparent #:reflection-name 'name)
            (define-match-expander name 
              (syntax-rules ()
                [(_ field ...)
