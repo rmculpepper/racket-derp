@@ -1,9 +1,7 @@
 #lang racket
-
-(require rackunit)
-
-(require "derp-core.rkt")
-(require "derp-sugar.rkt")
+(require rackunit
+         "derp-core.rkt"
+         "derp-sugar.rkt")
 
 (check-pred 
  (λ (L)
