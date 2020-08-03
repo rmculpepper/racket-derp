@@ -5,16 +5,16 @@
 (provide (all-defined-out))
 
 ; Atomic parsers:
-(define-struct ∅      {}          #:transparent)  ; empty set
-(define-struct ε      {tree-set}  #:transparent)  ; empty string
-(define-struct token  {value?}    #:transparent)  ; token class
+(struct ∅      {}          #:transparent)  ; empty set
+(struct ε      {tree-set}  #:transparent)  ; empty string
+(struct token  {value?}    #:transparent)  ; token class
 
 ; Compound parsers:
-(define-lazy-struct δ {lang})
-(define-lazy-struct ∪ {this that})
-(define-lazy-struct ∘ {left right})
-(define-lazy-struct ★ {lang})
-(define-lazy-struct → {lang reduce})
+(lazy-struct δ {lang})
+(lazy-struct ∪ {this that})
+(lazy-struct ∘ {left right})
+(lazy-struct ★ {lang})
+(lazy-struct → {lang reduce})
 
 ; Derivative:
 (define/memoize (D c p)

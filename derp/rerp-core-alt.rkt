@@ -6,14 +6,14 @@
 ; of a regular language recognizer.
 
 ; Atomic languages:
-(define-struct ∅     {}      #:transparent)  ; empty set
-(define-struct ε     {}      #:transparent)  ; empty string
-(define-struct token {value} #:transparent)  ; exact terminal
+(struct ∅     {}      #:transparent)  ; empty set
+(struct ε     {}      #:transparent)  ; empty string
+(struct token {value} #:transparent)  ; exact terminal
 
 ; Compound languages:
-(define-struct ∪ {this that}  #:transparent) ; union
-(define-struct ∘ {left right} #:transparent) ; concatenation
-(define-struct ★ {lang}       #:transparent) ; repetition
+(struct ∪ {this that}  #:transparent) ; union
+(struct ∘ {left right} #:transparent) ; concatenation
+(struct ★ {lang}       #:transparent) ; repetition
 
 ; Derivative:
 (define (D c L)

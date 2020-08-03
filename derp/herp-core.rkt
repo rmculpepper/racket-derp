@@ -7,15 +7,15 @@
 ; of a context-free language recognizer.
 
 ; Atomic languages:
-(define-struct ∅     {})       ; empty set
-(define-struct ε     {})       ; empty string
-(define-struct token {value})  ; exact terminal
+(struct ∅     {}      #:transparent)  ; empty set
+(struct ε     {}      #:transparent)  ; empty string
+(struct token {value} #:transparent)  ; exact terminal
 
 ; Compound languages:
-(define-lazy-struct δ {lang})       ; nullability
-(define-lazy-struct ∪ {this that})  ; union
-(define-lazy-struct ∘ {left right}) ; concatenation
-(define-lazy-struct ★ {lang})       ; repetition
+(lazy-struct δ {lang})       ; nullability
+(lazy-struct ∪ {this that})  ; union
+(lazy-struct ∘ {left right}) ; concatenation
+(lazy-struct ★ {lang})       ; repetition
 
 ; Derivative:
 (define/memoize (D c L)

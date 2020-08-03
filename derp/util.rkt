@@ -7,7 +7,8 @@
 ;; ----------------------------------------
 ;; Lazy structs
 
-(provide define-lazy-struct)
+(provide define-lazy-struct
+         (rename-out [define-lazy-struct lazy-struct]))
 
 (define-syntax (define-lazy-struct stx)
   (syntax-case stx ()
