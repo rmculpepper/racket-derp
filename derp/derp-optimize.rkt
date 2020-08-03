@@ -5,12 +5,27 @@
          "util.rkt")
 (provide (all-defined-out))
 
+; Nullability:
+(define/fix (nullable? L)
+  #:bottom #f
+  (match L
+    [(∅)        #f]
+    [(ε _)      #t]
+    [(token _)  #f]
+    [(δ L)      (nullable? L)]
+    [(∪ L1 L2)  (or  (nullable? L1) (nullable? L2))]
+    [(∘ L1 L2)  (and (nullable? L1) (nullable? L2))]
+    [(★ _)      #t]
+    [(→ L1 _)   (nullable? L1)]))
+
+;; Equal to the null language (ε):
 (define/fix (ε? L)
   #:bottom #t
   (match L
     [(∅)           #f]
     [(ε _)         #t]
     [(token _)     #f]
+    [(δ L)         (nullable? L)]
     [(∪ L1 L2)     (and (ε? L1) (ε? L2))]
     [(∘ L1 L2)     (and (ε? L1) (ε? L2))]
     [(★ L1)        (or  (ε? L1) (∅? L1))]
@@ -38,6 +53,7 @@
     [(∅)         #t]
     [(ε _)       #f]
     [(token _)   #f]
+    [(δ L)       (not (nullable? L))]
     [(★ L1)      #f]
     [(∪ L1 L2)   (and (∅? L1) (∅? L2))]
     [(∘ L1 L2)   (or  (∅? L1) (∅? L2))]
@@ -75,4 +91,4 @@
 (define (parse/compact w L #:compactor [compact K])
   (if (null? w)
       (parse-null L)
-      (parse/compact (cdr w) (compact L))))
+      (parse/compact (cdr w) (compact (D (car w) L)))))

@@ -1,6 +1,6 @@
 #lang racket
-(require racket/struct
-         "derp-core.rkt"
+(require "derp-core.rkt"
+         (only-in "derp-optimize.rkt" parse/compact)
          "util.rkt")
 
 ; Examples
@@ -17,3 +17,15 @@
 (pretty-print ab*)
 
 (parse '(a b b a) ab*2)
+
+;; ----
+
+(parse/compact '(a b b a) ab*)
+(parse/compact '(a b b a) ab*2)
+
+;; ----
+
+#|
+(define E (∪ (∘ E E) (ε (set 'ok))))
+(parse-null E)
+|#
