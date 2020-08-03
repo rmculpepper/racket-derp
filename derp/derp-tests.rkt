@@ -1,6 +1,6 @@
 #lang racket
 (require "derp-core.rkt"
-         (only-in "derp-optimize.rkt" parse/compact)
+         (only-in "derp-optimize.rkt" nullable? DK parse/compact)
          "util.rkt")
 
 ; Examples
@@ -14,14 +14,23 @@
 
 
 (parse '(a b b a) ab*)
-(pretty-print ab*)
-
 (parse '(a b b a) ab*2)
+
+#;
+(let ([L (foldl D ab* '(a b b a))])
+  (nullable? L)  ;; force promises
+  (pretty-print L))
 
 ;; ----
 
 (parse/compact '(a b b a) ab*)
 (parse/compact '(a b b a) ab*2)
+
+#;
+(let ([L (foldl DK ab* '(a b b a))])
+  (nullable? L)  ;; force promises
+  (pretty-print L))
+
 
 ;; ----
 

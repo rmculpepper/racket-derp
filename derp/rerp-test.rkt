@@ -1,8 +1,8 @@
 #lang racket/base
 (require racket/pretty)
 
-(require "rerp-core.rkt")
-;(require "rerp-core-alt.rkt")
+;(require "rerp-core.rkt")
+(require "rerp-core-alt.rkt")
 
 ; Examples
 

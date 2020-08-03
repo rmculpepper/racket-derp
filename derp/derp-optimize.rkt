@@ -88,6 +88,8 @@
     [(→ (→ L f) g)            (→ (K L) (compose g f))]
     [(→ L f)                  (→ (K L) f)]))
 
+(define (DK c L) (K (D c L)))
+
 (define (parse/compact w L #:compactor [compact K])
   (if (null? w)
       (parse-null L)
