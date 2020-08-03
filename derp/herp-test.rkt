@@ -19,7 +19,7 @@
 ;;(pretty-print ab*)
 
 (let ([L (foldl D ab* '(a b b a))])
-  (nullable? L)
+  (nullable? L)  ;; force promises
   (pretty-print L))
 
 (recognizes? '(a b c a) ab*)
