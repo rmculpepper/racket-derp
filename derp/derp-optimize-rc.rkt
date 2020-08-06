@@ -8,9 +8,10 @@
 
 
 ;; f is monotonic
+#;
 (define (fixed-point #:bottom bottom #:top [top (gensym)] mkf)
   (lambda (x)
-    (define h (make-hasheq))
+    (define h (make-hasheq)) ;; Promise => (cons Boolean Result)
     (define (f x)
       (match x
         [(rec p)
@@ -29,9 +30,32 @@
            [(cons #t value) value])]
         [_ (f-inner x)]))
     (define f-inner (mkf f))
-    f))
+    (f x)))
 
-#;
+(require racket/mpair)
+(define (fixed-point #:bottom bottom #:top [top (gensym)] mkf)
+  (lambda (x)
+    (define h (make-hasheq)) ;; Promise => (mpair Boolean Result)
+    (define (f x)
+      (match x
+        [(rec p)
+         (define s (hash-ref! h p (lambda () (mcons #f bottom))))
+         (cond [(or (mcar s) (equal? top (mcdr s)))
+                (mcdr s)]
+               [else
+                (set-mcar! s #t)
+                (define pv (force p))
+                (let loop ([value (mcdr s)])
+                  (define value2 (f pv))
+                  (unless (eqv? value2 value) (set-mcdr! s value2))
+                  (cond [(or (equal? value2 value)
+                             (equal? value2 top))
+                         (begin (set-mcar! s #f) value2)]
+                        [else (loop value2)]))])]
+        [_ (f-inner x)]))
+    (define f-inner (mkf f))
+    (f x)))
+
 (define nullable?
   (fixed-point
    #:bottom #f #:top #t
@@ -48,6 +72,7 @@
          [(→ L1 _)   (nullable? L1)]
          )))))
 
+#;
 ; Nullability:
 (define/fix (nullable? L)
   #:bottom #f
@@ -63,7 +88,6 @@
     [(rec pp)   (nullable? (force pp))]
     ))
 
-#;
 ;; Equal to the null language (ε):
 (define ε?
   (fixed-point
@@ -82,6 +106,7 @@
          [(rec pp)      (ε? (force pp))]
          )))))
 
+#;
 ;; Equal to the null language (ε):
 (define/fix (ε? L)
   #:bottom #t
@@ -112,7 +137,6 @@
                  (app parse-null (and (app set-count 1)
                                       (app set-choose el))))]))
 
-#;
 ; Checks whether a language is the empty set:
 (define ∅?
   (fixed-point
@@ -131,6 +155,7 @@
          [(rec pp)    (∅? (force pp))]
          )))))
 
+#;
 ; Checks whether a language is the empty set:
 (define/fix (∅? L)
   #:bottom #f ;; FIXME!
