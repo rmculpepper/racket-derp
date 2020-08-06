@@ -2,7 +2,7 @@
 (require racket/match
          racket/set
          racket/promise
-         "util.rkt")
+         "util-rc.rkt")
 (provide (all-defined-out))
 
 ; Atomic parsers:
@@ -16,7 +16,7 @@
 (struct ∘ {left right} #:transparent)
 (struct ★ {lang} #:transparent)
 (struct → {lang reduce} #:transparent)
-(struct rec (p) #:transparent)
+;;(struct rec (p) #:transparent)
 
 ; Derivative:
 (define (D c p)
@@ -43,6 +43,30 @@
   (loop p))
 
 ; Parsing null:
+(define parse-null
+  (fixed-point
+   #:bottom (set)
+   (lambda (parse-null)
+     (lambda (p)
+       (match p
+         [(ε S)        S]
+         [(∅)          (set)]
+         [(δ p)        (parse-null p)]
+         [(token _)    (set)]
+
+         [(★ _)        (set '())]
+         [(∪ p1 p2)    (set-union (parse-null p1) (parse-null p2))]
+         [(∘ p1 p2)    (for*/set ([t1 (parse-null p1)]
+                                  [t2 (parse-null p2)])
+                         (cons t1 t2))]
+         [(→ p1 f)     (for/set ([t (parse-null p1)])
+                         (f t))]
+
+         [(rec pp)     (parse-null (force pp))]
+         )))))
+
+#;
+; Parsing null:
 (define/fix (parse-null p)
   #:bottom (set)
   (match p
@@ -64,6 +88,4 @@
 
 ; Parse a list of tokens:
 (define (parse w p)
-  (if (null? w)
-      (parse-null p)
-      (parse (cdr w) (D (car w) p))))
+  (parse-null (foldl D p w)))
