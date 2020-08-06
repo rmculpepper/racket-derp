@@ -16,7 +16,9 @@
 (struct ∘ {left right} #:transparent)
 (struct ★ {lang} #:transparent)
 (struct → {lang reduce} #:transparent)
-;;(struct rec (p) #:transparent)
+
+;; Recursive parsers:
+;; (struct rec (p)) defined in util-xp.rkt
 
 ; Derivative:
 (define (D c p)
@@ -61,30 +63,7 @@
                          (cons t1 t2))]
          [(→ p1 f)     (for/set ([t (parse-null p1)])
                          (f t))]
-
-         [(rec pp)     (parse-null (force pp))]
          )))))
-
-#;
-; Parsing null:
-(define/fix (parse-null p)
-  #:bottom (set)
-  (match p
-    [(ε S)        S]
-    [(∅)          (set)]
-    [(δ p)        (parse-null p)]
-    [(token _)    (set)]
-
-    [(★ _)        (set '())]
-    [(∪ p1 p2)    (set-union (parse-null p1) (parse-null p2))]
-    [(∘ p1 p2)    (for*/set ([t1 (parse-null p1)]
-                             [t2 (parse-null p2)])
-                    (cons t1 t2))]
-    [(→ p1 f)     (for/set ([t (parse-null p1)])
-                    (f t))]
-
-    [(rec pp)     (parse-null (force pp))]
-    ))
 
 ; Parse a list of tokens:
 (define (parse w p)

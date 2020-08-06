@@ -1,7 +1,8 @@
 #lang racket/base
 (require racket/mpair
          racket/match
-         racket/promise)
+         racket/promise
+         racket/struct)
 (provide (struct-out rec)
          fixed-point
          is?)

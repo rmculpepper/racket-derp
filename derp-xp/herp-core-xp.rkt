@@ -2,7 +2,8 @@
 (require racket/match
          racket/promise
          "util-xp.rkt")
-(provide (all-defined-out))
+(provide (all-defined-out)
+         (struct-out rec))
 
 ; Herp Core implements the minimal core
 ; of a context-free language recognizer.
@@ -18,14 +19,10 @@
 (struct ∘ {left right} #:transparent) ; concatenation
 (struct ★ {lang} #:transparent)       ; repetition
 
-(struct rec (langp) #:transparent)
+;; Recursive languages:
+;; (struct rec (p)) defined in util-xp.rkt
 
 ; Derivative:
-
-;; (define Dh (make-hash)) ;; c => L => L
-;; (define h (hash-ref! Dh c make-hash))
-;; (define-syntax-rule (H e)
-;;   (if (hash-has-key? h L) (hash-ref h L) (let ([v e]) (hash-set! L v) v)))
 
 (define (D c L)
   (define h (make-hash))
@@ -49,22 +46,23 @@
 
 
 ; Nullability:
-(define/fix (nullable? L)
-  #:bottom #f
-  (match L
-    [(∅)           #f]
-    [(ε)           #t]
-    [(token _)     #f]
-    [(★ _)         #t]
-    [(δ L1)        (nullable? L1)]
-    [(∪ L1 L2)     (or (nullable? L1) (nullable? L2))]
-    [(∘ L1 L2)     (and (nullable? L1) (nullable? L2))]
-    [(rec p)       (and (nullable? (force p)))]
-    ))
+(define nullable?
+  (fixed-point
+   #:bottom #f #:top #t
+   (lambda (nullable?)
+     (lambda (L)
+       (match L
+         [(∅)           #f]
+         [(ε)           #t]
+         [(token _)     #f]
+         [(★ _)         #t]
+         [(δ L1)        (nullable? L1)]
+         [(∪ L1 L2)     (or (nullable? L1) (nullable? L2))]
+         [(∘ L1 L2)     (and (nullable? L1) (nullable? L2))]
+         ;; [(rec pL) ...] handled by fixed-point
+         )))))
 
 
 ; Parse a list of tokens:
 (define (recognizes? w L)
-  (if (null? w)
-      (nullable? L)
-      (recognizes? (cdr w) (D (car w) L))))
+  (nullable? (foldl D L w)))

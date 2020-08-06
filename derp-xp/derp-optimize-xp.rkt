@@ -21,6 +21,7 @@
          [(∘ L1 L2)  (and (nullable? L1) (nullable? L2))]
          [(★ _)      #t]
          [(→ L1 _)   (nullable? L1)]
+         ;;[(rec p) ...] handled by fixed-point
          )))))
 
 ;; Equal to the null language (ε):
@@ -38,7 +39,7 @@
          [(∘ L1 L2)     (and (ε? L1) (ε? L2))]
          [(★ L1)        (or  (ε? L1) (∅? L1))]
          [(→ L1 _)      (ε?  L1)]
-         [(rec pp)      (ε? (force pp))]
+         ;;[(rec p) ...] handled by fixed-point
          )))))
 
 ; Compute the size of a set:
@@ -71,7 +72,7 @@
          [(∪ L1 L2)   (and (∅? L1) (∅? L2))]
          [(∘ L1 L2)   (or  (∅? L1) (∅? L2))]
          [(→ L1 _)    (∅?  L1)]
-         [(rec pp)    (∅? (force pp))]
+         ;;[(rec p) ...] handled by fixed-point
          )))))
 
 ; Optimizing compaction.
