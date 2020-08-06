@@ -1,6 +1,5 @@
 #lang racket/base
-(require racket/mpair
-         racket/match
+(require racket/match
          racket/promise
          racket/struct)
 (provide (struct-out rec)
@@ -12,24 +11,26 @@
 ;; ----------------------------------------
 ;; Fixed points
 
+(struct state (running? value) #:mutable)
+
 (define (fixed-point #:bottom bottom #:top [top (gensym)] mkf)
   (lambda (x)
     (define h (make-hasheq)) ;; Promise => (mpair Boolean Result)
     (define (f x)
       (match x
         [(rec p)
-         (define s (hash-ref! h p (lambda () (mcons #f bottom))))
-         (cond [(or (mcar s) (equal? top (mcdr s)))
-                (mcdr s)]
+         (define s (hash-ref! h p (lambda () (state #f bottom))))
+         (cond [(or (state-running? s) (equal? top (state-value s)))
+                (state-value s)]
                [else
-                (set-mcar! s #t)
+                (set-state-running?! s #t)
                 (define pv (force p))
-                (let loop ([value (mcdr s)])
+                (let loop ([value (state-value s)])
                   (define value2 (f pv))
-                  (unless (eqv? value2 value) (set-mcdr! s value2))
+                  (unless (eqv? value2 value) (set-state-value! s value2))
                   (cond [(or (equal? value2 value)
                              (equal? value2 top))
-                         (begin (set-mcar! s #f) value2)]
+                         (begin (set-state-running?! s #f) value2)]
                         [else (loop value2)]))])]
         [_ (f-inner x)]))
     (define f-inner (mkf f))
