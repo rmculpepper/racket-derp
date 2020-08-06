@@ -3,9 +3,13 @@
          racket/match
          racket/promise)
 (provide (struct-out rec)
-         fixed-point)
+         fixed-point
+         is?)
 
 (struct rec (p) #:transparent)
+
+;; ----------------------------------------
+;; Fixed points
 
 (define (fixed-point #:bottom bottom #:top [top (gensym)] mkf)
   (lambda (x)
@@ -53,3 +57,17 @@
         [_ (f-inner x)]))
     (define f-inner (mkf f))
     (f x)))
+
+
+;; ----------------------------------------
+;; Curried, printable equality predicate
+
+(provide is?)
+
+;; is? : Any -> Any -> Boolean
+;; (define ((is? x) y) (equal? x y))
+(struct is? (v)
+  #:property prop:custom-write
+  (make-constructor-style-printer (lambda (s) 'is?) (lambda (s) (list (is?-v s))))
+  #:property prop:procedure
+  (lambda (self x) (equal? (is?-v self) x)))

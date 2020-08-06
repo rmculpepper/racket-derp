@@ -1,7 +1,7 @@
 #lang racket/base
 (require racket/match
          racket/promise
-         "util.rkt")
+         "util-xp.rkt")
 (provide (all-defined-out))
 
 ; Herp Core implements the minimal core

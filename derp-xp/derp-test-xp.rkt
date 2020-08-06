@@ -1,8 +1,7 @@
 #lang racket
-(require "derp-core-rc.rkt"
-         (only-in "derp-optimize-rc.rkt" nullable? DK parse/compact)
-         "util-rc.rkt"
-         (only-in "util.rkt" is?))
+(require "derp-core-xp.rkt"
+         (only-in "derp-optimize-xp.rkt" nullable? DK parse/compact)
+         "util-xp.rkt")
 
 ; Examples
 

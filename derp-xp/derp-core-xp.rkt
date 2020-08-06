@@ -2,7 +2,7 @@
 (require racket/match
          racket/set
          racket/promise
-         "util-rc.rkt")
+         "util-xp.rkt")
 (provide (all-defined-out))
 
 ; Atomic parsers:

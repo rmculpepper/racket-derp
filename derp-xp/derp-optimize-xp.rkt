@@ -2,8 +2,8 @@
 (require racket/match
          racket/promise
          racket/set
-         (except-in "derp-core-rc.rkt" ∅? ε?)
-         "util-rc.rkt")
+         (except-in "derp-core-xp.rkt" ∅? ε?)
+         "util-xp.rkt")
 (provide (all-defined-out))
 
 ; Nullability:
