@@ -1,0 +1,95 @@
+#lang racket/base
+(require racket/match
+         racket/set
+         racket/promise
+         "util-xr.rkt")
+(provide (all-defined-out))
+
+; Atomic parsers:
+(struct ∅      {}          #:transparent)  ; empty set
+(struct ε      {tree-set}  #:transparent)  ; empty string
+(struct token  {value?}    #:transparent)  ; token class
+
+; Compound parsers:
+(struct δ {lang} #:transparent)
+(struct ∪ {this that} #:transparent)
+(struct ∘ {left right} #:transparent)
+(struct ★ {lang} #:transparent)
+(struct → {lang reduce} #:transparent)
+
+;; Recursive parsers:
+;; (struct rec (p)) defined in util-xp.rkt
+
+; Derivative:
+#;
+(define (D c p)
+  (define h (make-hasheq))
+  (define (loop p)
+    (match p
+      [(∅)           (∅)]
+      [(ε _)         (∅)]
+      [(δ _)         (∅)]
+      [(token p?)    (cond
+                       [(p? c) (ε (set c))]
+                       [else   (∅)])]
+
+      [(∪ p1 p2)     (∪ (loop p1)
+                        (loop p2))]
+      [(★ p1)        (∘ (loop p1) p)]
+      [(→ p1 f)      (→ (loop p1) f)]
+      [(∘ p1 p2)     (∪ (∘ (δ p1) (loop p2))
+                        (∘ (loop p1) p2))]
+
+      [(rec pp)      (cond [(hash-ref h p #f) => values]
+                           [else
+                            (define result (rec 'invalid))
+                            (hash-set! h p result)
+                            (begin0 result (set-rec-v! result (loop pp)))])]
+      ))
+  (loop p))
+
+(define (D* c)
+  (rec-memoize
+   (lambda (loop)
+     (lambda (p)
+       (match p
+         [(∅)           (∅)]
+         [(ε _)         (∅)]
+         [(δ _)         (∅)]
+         [(token p?)    (cond
+                          [(p? c) (ε (set c))]
+                          [else   (∅)])]
+         [(∪ p1 p2)     (∪ (loop p1)
+                           (loop p2))]
+         [(★ p1)        (∘ (loop p1) p)]
+         [(→ p1 f)      (→ (loop p1) f)]
+         [(∘ p1 p2)     (∪ (∘ (δ p1) (loop p2))
+                           (∘ (loop p1) p2))]
+         )))))
+
+(define (D c p) ((D* c) p))
+
+; Parsing null:
+(define parse-null
+  (fixed-point
+   #:bottom (set)
+   (lambda (parse-null)
+     (lambda (p)
+       (match p
+         [(ε S)        S]
+         [(∅)          (set)]
+         [(δ p)        (parse-null p)]
+         [(token _)    (set)]
+
+         [(★ _)        (set '())]
+         [(∪ p1 p2)    (set-union (parse-null p1) (parse-null p2))]
+         [(∘ p1 p2)    (for*/set ([t1 (parse-null p1)]
+                                  [t2 (parse-null p2)])
+                         (cons t1 t2))]
+         [(→ p1 f)     (for/set ([t (parse-null p1)])
+                         (f t))]
+         )))))
+
+; Parse a list of tokens:
+(define (parse w p)
+  (parse-null (foldl D p w)))
