@@ -5,9 +5,16 @@
 
 ; Examples
 
+#|
 (define ab* (rec 'invalid))
 (set-rec-v! ab* (∪ (∘ ab* (∪ (token (is? 'a)) (token (is? 'b))))
                    (ε (set '()))))
+|#
+
+(define ab*
+  (shared ([ab* (rec (∪ (∘ ab* (∪ (token (is? 'a)) (token (is? 'b))))
+                        (ε (set '()))))])
+    ab*))
 
 #;
 (define ab*2 (∪ (∘ (∪ (token (is? 'a)) (token (is? 'b)))
